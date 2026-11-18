@@ -1,0 +1,686 @@
+Q1
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+
+package com.mycompany.mattresssales;
+import java.util.Scanner;
+/**
+ *
+ * @author Lehlohonolo.Mokoena
+ */
+
+// Interface containing the required product methods
+interface IProduct {
+
+    int calculateTotalSales();
+
+    double calculateAverageSales();
+
+    String getProductName();
+
+    int[] getMonthlySales();
+}
+
+
+// Product class implementing the IProduct interface
+class Product implements IProduct {
+
+    private String productName;
+    private int[] monthlySales;
+
+    // Constructor
+    public Product(String productName, int[] monthlySales) {
+        this.productName = productName;
+        this.monthlySales = monthlySales;
+    }
+
+    // Return the product name
+    @Override
+    public String getProductName() {
+        return productName;
+    }
+
+    // Return the monthly sales
+    @Override
+    public int[] getMonthlySales() {
+        return monthlySales;
+    }
+
+    // Calculate the total sales for one product
+    @Override
+    public int calculateTotalSales() {
+
+        int totalSales = 0;
+
+        for (int sales : monthlySales) {
+            totalSales += sales;
+        }
+
+        return totalSales;
+    }
+
+    // Calculate the average monthly sales for one product
+    @Override
+    public double calculateAverageSales() {
+
+        if (monthlySales.length == 0) {
+            return 0;
+        }
+
+        return (double) calculateTotalSales() / monthlySales.length;
+    }
+}
+
+
+// Class responsible for printing the sales report
+class PrintProduct {
+
+    private String[] monthNames;
+
+    // Constructor
+    public PrintProduct(String[] monthNames) {
+        this.monthNames = monthNames;
+    }
+
+    // Print the complete mattress sales report
+    public void printSalesReport(Product[] products) {
+
+        System.out.println();
+        System.out.println("==============================================================");
+        System.out.println("             MATRESS SALES REPORT");
+        System.out.println("               THREE-MONTH SALES REPORT");
+        System.out.println("==============================================================");
+
+        // Print headings
+        System.out.printf("%-22s", "Product");
+
+        for (String month : monthNames) {
+            System.out.printf("%-12s", month);
+        }
+
+        System.out.printf("%-12s%-12s%n", "Total", "Average");
+
+        System.out.println("--------------------------------------------------------------");
+
+        int companyTotalSales = 0;
+        Product mostPopularProduct = products[0];
+
+        // Print each product's sales
+        for (Product product : products) {
+
+            System.out.printf("%-22s", product.getProductName());
+
+            for (int sales : product.getMonthlySales()) {
+                System.out.printf("%-12d", sales);
+            }
+
+            int productTotal = product.calculateTotalSales();
+            double productAverage = product.calculateAverageSales();
+
+            System.out.printf("%-12d%-12.2f%n",
+                    productTotal,
+                    productAverage);
+
+            companyTotalSales += productTotal;
+
+            // Determine the most popular product
+            if (productTotal > mostPopularProduct.calculateTotalSales()) {
+                mostPopularProduct = product;
+            }
+        }
+
+        double averageSalesPerProduct =
+                (double) companyTotalSales / products.length;
+
+        System.out.println("==============================================================");
+        System.out.println("SALES SUMMARY");
+        System.out.println("==============================================================");
+
+        System.out.println("Total number of products sold: "
+                + companyTotalSales);
+
+        System.out.printf("Average number sold per product: %.2f%n",
+                averageSalesPerProduct);
+
+        System.out.println("Most popular product: "
+                + mostPopularProduct.getProductName());
+
+        System.out.println("Highest product sales: "
+                + mostPopularProduct.calculateTotalSales());
+
+        System.out.println("==============================================================");
+
+        printTopThreeProducts(products);
+    }
+
+    // Print the three top-performing mattress products
+    private void printTopThreeProducts(Product[] products) {
+
+        // Copy the products into another array
+        Product[] sortedProducts = new Product[products.length];
+
+        for (int i = 0; i < products.length; i++) {
+            sortedProducts[i] = products[i];
+        }
+
+        // Bubble sort products from highest to lowest sales
+        for (int i = 0; i < sortedProducts.length - 1; i++) {
+
+            for (int j = 0; j < sortedProducts.length - i - 1; j++) {
+
+                if (sortedProducts[j].calculateTotalSales()
+                        < sortedProducts[j + 1].calculateTotalSales()) {
+
+                    Product temporaryProduct = sortedProducts[j];
+                    sortedProducts[j] = sortedProducts[j + 1];
+                    sortedProducts[j + 1] = temporaryProduct;
+                }
+            }
+        }
+
+        System.out.println();
+        System.out.println("==============================================================");
+        System.out.println("               TOP THREE PERFORMING PRODUCTS");
+        System.out.println("==============================================================");
+
+        int numberOfTopProducts = Math.min(3, sortedProducts.length);
+
+        for (int i = 0; i < numberOfTopProducts; i++) {
+
+            System.out.println((i + 1) + ". "
+                    + sortedProducts[i].getProductName()
+                    + " - "
+                    + sortedProducts[i].calculateTotalSales()
+                    + " units");
+        }
+
+        System.out.println("==============================================================");
+    }
+}
+
+
+// Main application class
+
+public class MattressSales {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Single-dimensional array storing the month names
+        String[] monthNames = {
+            "January",
+            "February",
+            "March"
+        };
+
+        // Single-dimensional array storing the product names
+        String[] productNames = {
+            "Cozy Nights Monarch",
+            "Restonic Barbados",
+            "Sealy Phuket"
+            
+        };
+
+        /*
+         * Two-dimensional array storing product sales.
+         *
+         * Rows represent products.
+         * Columns represent January, February and March.
+         */
+        int[][] productSales = new int[productNames.length][monthNames.length];
+
+        System.out.println("=================================================");
+        System.out.println("      MATTRESS SALES REPORT");
+        System.out.println("=================================================");
+
+        // Capture sales for every product over three months
+        for (int product = 0;
+             product < productNames.length;
+             product++) {
+
+            System.out.println();
+            System.out.println("Enter sales for "
+                    + productNames[product] + ":");
+
+            for (int month = 0;
+                 month < monthNames.length;
+                 month++) {
+
+                productSales[product][month] =
+                        getValidSalesInput(
+                                scanner,
+                                monthNames[month]
+                        );
+            }
+        }
+
+        // Create an array of Product objects
+        Product[] products = new Product[productNames.length];
+
+        for (int i = 0; i < productNames.length; i++) {
+
+            products[i] = new Product(
+                    productNames[i],
+                    productSales[i]
+            );
+        }
+
+        // Create the report printer and display the report
+        PrintProduct printProduct =
+                new PrintProduct(monthNames);
+
+        printProduct.printSalesReport(products);
+
+        scanner.close();
+    }
+
+    // Method that prevents invalid or negative sales values
+    private static int getValidSalesInput(
+            Scanner scanner,
+            String monthName) {
+
+        while (true) {
+
+            System.out.print(monthName + ": ");
+
+            if (scanner.hasNextInt()) {
+
+                int sales = scanner.nextInt();
+
+                if (sales >= 0) {
+                    return sales;
+                }
+
+                System.out.println(
+                        "Sales cannot be negative. Please try again."
+                );
+
+            } else {
+
+                System.out.println(
+                        "Invalid input. Please enter a whole number."
+                );
+
+                scanner.next();
+            }
+        }
+    }
+}
+
+
+
+Q2
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+
+package com.mycompany.matresssalesreport;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+
+/**
+ *
+ * @author Lehlohonolo.Mokoena
+ */
+public class MatressSalesReport extends JFrame implements ActionListener {
+    
+    // GUI Components
+    private JTextField txtCustomerName;
+    private JComboBox<String> cmbProductName;
+    private JTextField txtSalesPrice;
+
+    private JTextField txtVAT;
+    private JTextField txtCommission;
+    private JTextField txtTotal;
+
+    private JButton btnCalculate;
+    private JButton btnClear;
+    private JButton btnExit;
+
+    // VAT = 15% and Commission = 5%
+    private static final double VAT_RATE = 0.15;
+    private static final double COMMISSION_RATE = 0.05;
+
+    private final DecimalFormat money =
+            new DecimalFormat("R #,##0.00");
+
+    // Constructor
+    public MatressSalesReport() {
+
+        setTitle("Mattress Sales Application");
+        setSize(550, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 15));
+        mainPanel.setBorder(new EmptyBorder(20, 30, 20, 30));
+
+        // ============================================
+        // HEADING
+        // ============================================
+
+        JLabel lblHeading =
+                new JLabel("MATTRESS SALES APPLICATION",
+                        SwingConstants.CENTER);
+
+        lblHeading.setFont(
+                new Font("Arial", Font.BOLD, 22)
+        );
+
+        lblHeading.setForeground(
+                new Color(0, 70, 140)
+        );
+
+        mainPanel.add(lblHeading, BorderLayout.NORTH);
+
+        // ============================================
+        // FORM PANEL
+        // ============================================
+
+        JPanel formPanel =
+                new JPanel(new GridLayout(6, 2, 10, 15));
+
+        // Customer Name
+        JLabel lblCustomerName =
+                new JLabel("Customer Name:");
+
+        txtCustomerName = new JTextField();
+
+        // Product Name
+        JLabel lblProductName =
+                new JLabel("Product Name:");
+
+        // Combo box containing mattress products
+        String[] products = {
+                "Cozy Nights",
+                "Monarch"
+        };
+
+        cmbProductName =
+                new JComboBox<>(products);
+
+        // Sales Price
+        JLabel lblSalesPrice =
+                new JLabel("Sales Price:");
+
+        txtSalesPrice =
+                new JTextField();
+
+        // VAT
+        JLabel lblVAT =
+                new JLabel("VAT Amount (15%):");
+
+        txtVAT =
+                new JTextField();
+
+        txtVAT.setEditable(false);
+
+        // Commission
+        JLabel lblCommission =
+                new JLabel("Commission (5%):");
+
+        txtCommission =
+                new JTextField();
+
+        txtCommission.setEditable(false);
+
+        // Total Amount
+        JLabel lblTotal =
+                new JLabel("Total Sales Amount:");
+
+        txtTotal =
+                new JTextField();
+
+        txtTotal.setEditable(false);
+
+        // Add components to form
+        formPanel.add(lblCustomerName);
+        formPanel.add(txtCustomerName);
+
+        formPanel.add(lblProductName);
+        formPanel.add(cmbProductName);
+
+        formPanel.add(lblSalesPrice);
+        formPanel.add(txtSalesPrice);
+
+        formPanel.add(lblVAT);
+        formPanel.add(txtVAT);
+
+        formPanel.add(lblCommission);
+        formPanel.add(txtCommission);
+
+        formPanel.add(lblTotal);
+        formPanel.add(txtTotal);
+
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+
+        // ============================================
+        // BUTTON PANEL
+        // ============================================
+
+        JPanel buttonPanel = new JPanel();
+
+        btnCalculate =
+                new JButton("Calculate");
+
+        btnClear =
+                new JButton("Clear");
+
+        btnExit =
+                new JButton("Exit");
+
+        // Add action listeners
+        btnCalculate.addActionListener(this);
+        btnClear.addActionListener(this);
+        btnExit.addActionListener(this);
+
+        buttonPanel.add(btnCalculate);
+        buttonPanel.add(btnClear);
+        buttonPanel.add(btnExit);
+
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(mainPanel);
+
+        setVisible(true);
+    }
+
+    // ============================================
+    // BUTTON EVENTS
+    // ============================================
+
+    @Override
+    public void actionPerformed(ActionEvent event) {
+
+        if (event.getSource() == btnCalculate) {
+
+            calculateSale();
+
+        } else if (event.getSource() == btnClear) {
+
+            clearForm();
+
+        } else if (event.getSource() == btnExit) {
+
+            System.exit(0);
+        }
+    }
+
+    // ============================================
+    // CALCULATE METHOD
+    // ============================================
+
+    private void calculateSale() {
+
+        String customerName =
+                txtCustomerName.getText().trim();
+
+        String productName =
+                cmbProductName.getSelectedItem().toString();
+
+        // Validate customer name
+        if (customerName.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter the customer's name.",
+                    "Customer Name Required",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            txtCustomerName.requestFocus();
+            return;
+        }
+
+        // Validate sales price
+        if (txtSalesPrice.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter the mattress sales price.",
+                    "Sales Price Required",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            txtSalesPrice.requestFocus();
+            return;
+        }
+
+        try {
+
+            // Get sales price from text field
+            double salesPrice =
+                    Double.parseDouble(
+                            txtSalesPrice.getText().trim()
+                    );
+
+            if (salesPrice <= 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Sales price must be greater than zero.",
+                        "Invalid Price",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+            }
+
+            // ============================================
+            // CALCULATIONS
+            // ============================================
+
+            // VAT = Sales price x 15%
+            double vatAmount =
+                    salesPrice * VAT_RATE;
+
+            // Commission = Sales price x 5%
+            double commission =
+                    salesPrice * COMMISSION_RATE;
+
+            // Total = Price + VAT + Commission
+            double totalAmount =
+                    salesPrice
+                    + vatAmount
+                    + commission;
+
+            // ============================================
+            // DISPLAY RESULTS
+            // ============================================
+
+            txtVAT.setText(
+                    money.format(vatAmount)
+            );
+
+            txtCommission.setText(
+                    money.format(commission)
+            );
+
+            txtTotal.setText(
+                    money.format(totalAmount)
+            );
+
+            // Display transaction summary
+            JOptionPane.showMessageDialog(
+                    this,
+
+                    "MATRESS SALES REPORT\n\n"
+                    + "Customer Name: "
+                    + customerName
+                    + "\n"
+                    + "Product Name: "
+                    + productName
+                    + "\n"
+                    + "Sales Price: "
+                    + money.format(salesPrice)
+                    + "\n"
+                    + "VAT (15%): "
+                    + money.format(vatAmount)
+                    + "\n"
+                    + "Commission (5%): "
+                    + money.format(commission)
+                    + "\n"
+                    + "Total Sales Amount: "
+                    + money.format(totalAmount),
+
+                    "Sales Report",
+
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter a valid numerical sales price.\n"
+                    + "For example: 5000 or 5999.99",
+                    "Invalid Sales Price",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            txtSalesPrice.requestFocus();
+        }
+    }
+
+    // ============================================
+    // CLEAR METHOD
+    // ============================================
+
+    private void clearForm() {
+
+        txtCustomerName.setText("");
+
+        cmbProductName.setSelectedIndex(0);
+
+        txtSalesPrice.setText("");
+
+        txtVAT.setText("");
+
+        txtCommission.setText("");
+
+        txtTotal.setText("");
+
+        txtCustomerName.requestFocus();
+    }
+
+
+
+
+
+    public static void main(String[] args) {
+                SwingUtilities.invokeLater(() -> {
+
+            new MatressSalesReport();
+
+        });
+    }
+
+    
